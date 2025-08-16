@@ -59,4 +59,7 @@ jobs:
             exit 1
           fi
 
-          echo "✅ All tests passed."
+          # Print summary
+          summary=$(echo "$output" | grep -E "Total tests:")
+          echo "✅ Test summary: $summary"
+          echo "🎉 All tests passed successfully."
