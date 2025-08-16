@@ -5,7 +5,7 @@ namespace WebAPITest
         [Fact]
         public void Add_ShouldReturnSum()
         {
-            Assert.Equal(5, 2 + 3);
+            Assert.Equal(4, 2 + 3);
         }
 
         [Fact]
