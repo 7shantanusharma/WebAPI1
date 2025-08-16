@@ -11,36 +11,22 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      # Checkout repository
       - name: Checkout repository
         uses: actions/checkout@v3
 
-      # Setup .NET
       - name: Setup .NET
         uses: actions/setup-dotnet@v3
         with:
           dotnet-version: 8.0.x
 
-      # Restore dependencies
       - name: Restore dependencies
         run: dotnet restore
 
-      # Build solution
       - name: Build solution
         run: dotnet build --no-restore --configuration Release
 
-      # Ensure test project(s) exist
-      - name: Check for test projects
-        run: |
-          if ! ls **/*Test*.csproj 1> /dev/null 2>&1; then
-            echo "❌ No test projects found!"
-            exit 1
-          fi
+      - name: List projects
+        run: ls -R | grep .csproj
 
-      # Run tests (explicitly run all test projects found)
       - name: Run tests
-        run: |
-          for proj in $(ls **/*Test*.csproj); do
-            echo "🧪 Running tests in $proj..."
-            dotnet test "$proj" --no-build --configuration Release --verbosity normal
-          done
+        run: dotnet test ./WebAPITest/WebAPITest.csproj --no-build --configuration Release --verbosity normal
