@@ -1,13 +1,13 @@
 name: CI Pipeline
 
 on:
-    push:
-        branches: [ main ]
-    pull_request:
-        branches: [ main ]
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
 
 jobs:
-    build:
+  build:
     runs-on: ubuntu-latest
 
     steps:
@@ -15,7 +15,7 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v3
 
-      # Setup .NET (for C# projects, since you work with .NET)
+      # Setup .NET (for C# projects)
       - name: Setup .NET
         uses: actions/setup-dotnet@v3
         with:
@@ -28,16 +28,21 @@ jobs:
       # Build project
       - name: Build
         run: dotnet build --no-restore --configuration Release
-        
+
+      # Check for test projects
       - name: Check for test projects
         run: |
-            if ! grep -q 'Microsoft.NET.Sdk.Test' ./**/*.csproj; then
+          if ! grep -q 'Microsoft.NET.Test.Sdk' ./**/*.csproj; then
             echo "❌ No test projects found. Failing pipeline."
             exit 1
-            else
+          else
             echo "✅ Test project(s) detected."
-            fi
+          fi
 
       # Run tests
       - name: Run Tests
-        run: dotnet test --no-build --verbosity normal
+        run: |
+          dotnet test --no-build --verbosity normal || {
+            echo "❌ No tests executed. Failing pipeline.";
+            exit 1;
+          }
