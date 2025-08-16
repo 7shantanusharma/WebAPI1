@@ -45,11 +45,18 @@ jobs:
         run: |
           echo "🧪 Running tests..."
           output=$(dotnet test --no-build --configuration Release --verbosity normal 2>&1)
+          exit_code=$?
           echo "$output"
 
-          # Fail if dotnet test returned non-zero (means test failures)
-          if [ $? -ne 0 ]; then
+          # Fail if dotnet test returned non-zero (means some tests failed)
+          if [ $exit_code -ne 0 ]; then
             echo "❌ Some tests failed."
+            exit 1
+          fi
+
+          # Fail if no tests discovered
+          if ! echo "$output" | grep -Eq "Total tests:\s*[1-9][0-9]*"; then
+            echo "❌ No tests executed. Failing pipeline."
             exit 1
           fi
 
@@ -57,3 +64,4 @@ jobs:
           summary=$(echo "$output" | grep -E "Total tests:")
           echo "✅ Test summary: $summary"
           echo "🎉 All tests passed successfully."
+
