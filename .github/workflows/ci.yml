@@ -54,7 +54,7 @@ jobs:
           fi
 
           # Fail if no tests discovered
-          if ! echo "$output" | grep -q "Total tests: [1-9]"; then
+          if ! echo "$output" | grep -q "Total tests: [1-9][0-9]*"; then
             echo "❌ No tests executed. Failing pipeline."
             exit 1
           fi
