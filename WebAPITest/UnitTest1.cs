@@ -8,6 +8,12 @@ namespace WebAPITest
             Assert.Equal(5, 2 + 3);
         }
 
+        [Fact]
+        public void Add_ShouldReturnSum2()
+        {
+            Assert.Equal(4, 2 + 2);
+        }
+
         [Theory]
         [InlineData(2, 3, 5)]
         [InlineData(10, 5, 15)]
