@@ -15,7 +15,7 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v3
 
-      # Setup .NET (for C# projects)
+      # Setup .NET
       - name: Setup .NET
         uses: actions/setup-dotnet@v3
         with:
@@ -36,13 +36,30 @@ jobs:
             echo "❌ No test projects found. Failing pipeline."
             exit 1
           else
-            echo "✅ Test project(s) detected."
+            echo "✅ Test project(s) detected:"
+            grep 'Microsoft.NET.Test.Sdk' ./**/*.csproj || true
           fi
 
-      # Run tests
+      # Run tests (fail if tests fail OR if zero tests run)
       - name: Run Tests
         run: |
-          dotnet test --no-build --verbosity normal || {
-            echo "❌ No tests executed. Failing pipeline.";
-            exit 1;
-          }
+          echo "🧪 Running tests..."
+          output=$(dotnet test --no-build --configuration Release --verbosity normal 2>&1)
+          echo "$output"
+
+          # Fail if dotnet test returned non-zero (means test failures)
+          if [ $? -ne 0 ]; then
+            echo "❌ Some tests failed."
+            exit 1
+          fi
+
+          # Fail if no tests discovered
+          if ! echo "$output" | grep -Eq "Total tests:\s*[1-9][0-9]*"; then
+            echo "❌ No tests executed. Failing pipeline."
+            exit 1
+          fi
+
+          # Print summary
+          summary=$(echo "$output" | grep -E "Total tests:")
+          echo "✅ Test summary: $summary"
+          echo "🎉 All tests passed successfully."
